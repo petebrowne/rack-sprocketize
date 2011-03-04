@@ -5,6 +5,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'rspec'
 require 'construct'
+require 'pathname'
 require 'rack/sprocketize'
 
 RSpec.configure do |config|

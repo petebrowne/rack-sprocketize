@@ -52,10 +52,10 @@ describe Rack::Sprocketize do
         c.file 'app/javascripts/main.js', '1'
         
         app.call(request)
+        sleep 1
         c.file 'app/javascripts/another.js', %{//= require "_plugin"}
         c.file 'app/javascripts/_plugin.js', '2'
         
-        sleep 1
         app.call(request)
         File.read('public/javascripts/another.js').should == '2'
       end
@@ -68,11 +68,50 @@ describe Rack::Sprocketize do
         c.file 'app/javascripts/main.js', '1'
         
         app.call(request)
-        original_mtime = File.mtime('public/javascripts/main.js')
-        
         sleep 1
+        
+        output_file = Pathname.new('public/javascripts/main.js')
+        expect {
+          app.call(request)
+        }.to_not change(output_file, :mtime)
+      end
+    end
+  end
+  
+  context 'in a production environment' do
+    before do
+      Rails = double(:rails, :env => double(:env, :to_s => 'production'))
+    end
+    
+    after do
+      Object.send(:remove_const, :Rails)
+    end
+    
+    it 'concatenates only one time' do
+      within_construct do |c|
+        c.file 'app/javascripts/main.js', '1'
+        
         app.call(request)
-        File.mtime('public/javascripts/main.js').should == original_mtime
+        sleep 1
+        c.file 'app/javascripts/main.js', '2'
+        
+        app.call(request)
+        File.read('public/javascripts/main.js').should == '1'
+      end
+    end
+    
+    context 'with a :sprocketize param' do
+      it 'concatenates again' do
+        within_construct do |c|
+          c.file 'app/javascripts/main.js', '1'
+          
+          app.call(request)
+          sleep 1
+          c.file 'app/javascripts/main.js', '2'
+          
+          app.call request('/?sprocketize=1')
+          File.read('public/javascripts/main.js').should == '2'
+        end
       end
     end
   end
