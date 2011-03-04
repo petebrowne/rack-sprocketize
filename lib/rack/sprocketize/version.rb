@@ -1,5 +1,5 @@
 module Rack
-  module Sprocketize
+  class Sprocketize
     VERSION = '0.1.0'
   end
 end

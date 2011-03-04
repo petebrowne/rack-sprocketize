@@ -14,9 +14,10 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = 'rack-sprocketize'
   
-  s.add_dependency             'rack',      '~> 1.2.1'
-  s.add_dependency             'sprockets', '~> 1.0.2'
-  s.add_development_dependency 'rspec',     '~> 2.5.0'
+  s.add_dependency             'rack',           '~> 1.2.1'
+  s.add_dependency             'sprockets',      '~> 1.0.2'
+  s.add_development_dependency 'rspec',          '~> 2.5.0'
+  s.add_development_dependency 'test-construct', '~> 1.2.0'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
