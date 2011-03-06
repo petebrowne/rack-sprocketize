@@ -10,6 +10,20 @@ module Rack
         @secretary   = Sprockets::Secretary.new Sprocketize.options.merge(:source_files => [ @source_file ])
       end
       
+      def compress(output)
+        if defined?(JSMin)
+          JSMin.minify(output)
+        elsif defined?(Packr)
+          Packr.pack output, compression_options(:shrink_vars => true)
+        elsif defined?(YUI) and defined?(YUI::JavaScriptCompressor)
+          YUI::JavaScriptCompressor.new(compression_options(:munge => true)).compress(output)
+        elsif defined?(Closure) and defined?(Closure::Compiler)
+          Closure::Compiler.new(compression_options).compile(output)
+        else
+          output
+        end
+      end
+      
       def concat
         @secretary.concatenation.to_s
       end
@@ -21,9 +35,17 @@ module Rack
       def sprocketize
         FileUtils.mkdir_p ::File.dirname(@output_path)
         ::File.open(@output_path, 'w') do |file|
-          file.write(concat.strip)
+          output = concat
+          output = compress(output) if Sprocketize.compress?
+          file.write(output.strip)
         end
       end
+      
+      protected
+      
+        def compression_options(defaults = {})
+          defaults.merge Sprocketize.compression_options
+        end
     end
   end
 end

@@ -12,13 +12,32 @@ module Rack
     }.freeze
     
     class << self
-      attr_accessor :options, :source_path, :output_path, :always_check
+      attr_accessor :options, :compression_options, :source_path, :output_path, :always_check, :compress
+      
+      def configure(options = {})
+        self.options             = DEFAULT_OPTIONS.dup.merge(options)
+        self.compression_options = self.options.delete(:compression_options) || {}
+        self.source_path         = ::File.expand_path self.options.delete(:source_path)
+        self.output_path         = ::File.expand_path self.options.delete(:output_path)
+      
+        self.always_check = if self.options.key?(:always_check)
+          self.options.delete(:always_check)
+        else
+          self.environment == 'development'
+        end
+      
+        self.compress = if self.options.key?(:compress)
+          self.options.delete(:compress)
+        else
+          self.environment == 'production'
+        end
+      end
       
       def environment
         if defined?(RAILS_ENV)
           RAILS_ENV # Rails 2
         elsif defined?(Rails) && defined?(Rails.env)
-          Rails.env # Rails 3
+          Rails.env.to_s # Rails 3
         elsif defined?(@app.settings) && defined?(@app.settings.environment)
           @app.settings.environment # Sinatra
         elsif ENV.key?('RACK_ENV')
@@ -31,19 +50,15 @@ module Rack
       def always_check?
         !!@always_check
       end
+      
+      def compress?
+        !!@compress
+      end
     end
     
     def initialize(app, options = {})
       @app = app
-      
-      Sprocketize.options      = DEFAULT_OPTIONS.dup.merge(options)
-      Sprocketize.source_path  = ::File.expand_path Sprocketize.options.delete(:source_path)
-      Sprocketize.output_path  = ::File.expand_path Sprocketize.options.delete(:output_path)
-      Sprocketize.always_check = if Sprocketize.options.key?(:always_check)
-        Sprocketize.options.delete(:always_check)
-      else
-        Sprocketize.environment == 'development'
-      end
+      Sprocketize.configure(options)
     end
     
     def call(env)

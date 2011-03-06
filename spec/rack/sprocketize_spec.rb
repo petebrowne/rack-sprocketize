@@ -14,6 +14,18 @@ describe Rack::Sprocketize do
       File.read('public/javascripts/another.js').should == "1"
     end
   end
+    
+  it 'does not compress the output' do
+    reveal_const :JSMin do
+      within_construct do |c|
+        c.file 'app/javascripts/main.js', '1'
+      
+        JSMin.should_not_receive(:minify)
+        app.call(request)
+        File.read('public/javascripts/main.js').should == '1'
+      end
+    end
+  end
   
   context 'when main files are updated' do
     it 'concatenates again' do
@@ -93,9 +105,71 @@ describe Rack::Sprocketize do
     end
   end
   
+  context 'with :compress set to true' do
+    context 'with jsmin required' do
+      it 'compresses the output' do
+        reveal_const :JSMin do
+          within_construct do |c|
+            c.file 'app/javascripts/main.js', '1'
+          
+            JSMin.should_receive(:minify).with("1\n").and_return('compressed')
+            app(:compress => true).call(request)
+            File.read('public/javascripts/main.js').should == 'compressed'
+          end
+        end
+      end
+    end
+    
+    context 'with packr required' do
+      it 'compresses the output' do
+        reveal_const :Packr do
+          within_construct do |c|
+            c.file 'app/javascripts/main.js', '1'
+          
+            Packr.should_receive(:pack).with("1\n", :shrink_vars => true).and_return('compressed')
+            app(:compress => true).call(request)
+            File.read('public/javascripts/main.js').should == 'compressed'
+          end
+        end
+      end
+    end
+    
+    context 'with yui/compressor required' do
+      it 'compresses the output' do
+        reveal_const :YUI do
+          within_construct do |c|
+            c.file 'app/javascripts/main.js', '1'
+          
+            compressor = double(:compressor)
+            compressor.should_receive(:compress).with("1\n").and_return('compressed')
+            YUI::JavaScriptCompressor.should_receive(:new).with(:munge => true).and_return(compressor)
+            app(:compress => true).call(request)
+            File.read('public/javascripts/main.js').should == 'compressed'
+          end
+        end
+      end
+    end
+    
+    context 'with closure-compiler required' do
+      it 'compresses the output' do
+        reveal_const :Closure do
+          within_construct do |c|
+            c.file 'app/javascripts/main.js', '1'
+          
+            compiler = double(:compiler)
+            compiler.should_receive(:compile).with("1\n").and_return('compressed')
+            Closure::Compiler.should_receive(:new).and_return(compiler)
+            app(:compress => true).call(request)
+            File.read('public/javascripts/main.js').should == 'compressed'
+          end
+        end
+      end
+    end
+  end
+  
   context 'in a production environment' do
     before do
-      Rails = double(:rails, :env => double(:env, :to_s => 'production'))
+      Rails = double(:rails, :env => 'production')
     end
     
     after do
@@ -112,6 +186,18 @@ describe Rack::Sprocketize do
         
         app.call(request)
         File.read('public/javascripts/main.js').should == '1'
+      end
+    end
+    
+    it 'compresses the output' do
+      reveal_const :JSMin do
+        within_construct do |c|
+          c.file 'app/javascripts/main.js', '1'
+        
+          JSMin.should_receive(:minify).with("1\n").and_return('compressed')
+          app.call(request)
+          File.read('public/javascripts/main.js').should == 'compressed'
+        end
       end
     end
     
