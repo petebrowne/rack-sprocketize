@@ -12,29 +12,37 @@ module Rack
     }.freeze
     
     class << self
-      attr_accessor :options, :source_path, :output_path, :environment
+      attr_accessor :options, :source_path, :output_path, :always_check
       
-      def production?
-        self.environment.to_s == 'production'
+      def environment
+        if defined?(RAILS_ENV)
+          RAILS_ENV # Rails 2
+        elsif defined?(Rails) && defined?(Rails.env)
+          Rails.env # Rails 3
+        elsif defined?(@app.settings) && defined?(@app.settings.environment)
+          @app.settings.environment # Sinatra
+        elsif ENV.key?('RACK_ENV')
+          ENV['RACK_ENV']
+        else
+          'development'
+        end
+      end
+      
+      def always_check?
+        !!@always_check
       end
     end
     
     def initialize(app, options = {})
       @app = app
       
-      Sprocketize.options     = DEFAULT_OPTIONS.dup.merge(options)
-      Sprocketize.source_path = ::File.expand_path Sprocketize.options.delete(:source_path)
-      Sprocketize.output_path = ::File.expand_path Sprocketize.options.delete(:output_path)
-      Sprocketize.environment = if defined?(RAILS_ENV)
-        RAILS_ENV # Rails 2
-      elsif defined?(Rails) && defined?(Rails.env)
-        Rails.env # Rails 3
-      elsif defined?(@app.settings) && defined?(@app.settings.environment)
-        @app.settings.environment # Sinatra
-      elsif ENV.key?('RACK_ENV')
-        ENV['RACK_ENV']
+      Sprocketize.options      = DEFAULT_OPTIONS.dup.merge(options)
+      Sprocketize.source_path  = ::File.expand_path Sprocketize.options.delete(:source_path)
+      Sprocketize.output_path  = ::File.expand_path Sprocketize.options.delete(:output_path)
+      Sprocketize.always_check = if Sprocketize.options.key?(:always_check)
+        Sprocketize.options.delete(:always_check)
       else
-        :development
+        Sprocketize.environment == 'development'
       end
     end
     
@@ -47,11 +55,8 @@ module Rack
     protected
     
       def skip?
-        if Sprocketize.production?
-          @sprocketized && @request.params['sprocketize'].nil?
-        else
-          false
-        end
+        return false if Sprocketize.always_check?
+        @sprocketized && @request.params['sprocketize'].nil?
       end
       
       def source_files
