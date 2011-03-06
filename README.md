@@ -43,6 +43,10 @@ Rack::Sprocketize will sprocketize them into `:output_path` like this:
     var plugin = 'blah';
     
 Notice how the files weren't all concatenated into one file. You use Sprockets' `//= require` syntax to control how the files will be concatenated.
+
+Both the `:source_path` and `:output_path` can be customized when setting up Rack::Sprocketize:
+
+    use Rack::Sprocketize, :source_path => 'js', :output_path => 'public/js'
       
 ### Compression
       
@@ -72,4 +76,4 @@ By default, the files are only compressed in a production environment. If for so
 
 ## Copyright
 
-Copyright (c) 2010 [Peter Browne](http://petebrowne.com). See LICENSE for details.
+Copyright (c) 2011 [Peter Browne](http://petebrowne.com). See LICENSE for details.
