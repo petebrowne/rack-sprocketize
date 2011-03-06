@@ -36,7 +36,7 @@ module Rack
         FileUtils.mkdir_p ::File.dirname(@output_path)
         ::File.open(@output_path, 'w') do |file|
           output = concat
-          output = compress(output) if Sprocketize.compress?
+          output = compress(output) if Sprocketize.always_compress?
           file.write(output.strip)
         end
       end

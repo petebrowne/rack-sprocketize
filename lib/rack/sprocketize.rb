@@ -12,7 +12,7 @@ module Rack
     }.freeze
     
     class << self
-      attr_accessor :options, :compression_options, :source_path, :output_path, :always_check, :compress
+      attr_accessor :options, :compression_options, :source_path, :output_path, :always_check, :always_compress
       
       def configure(options = {})
         self.options             = DEFAULT_OPTIONS.dup.merge(options)
@@ -26,8 +26,8 @@ module Rack
           self.environment == 'development'
         end
       
-        self.compress = if self.options.key?(:compress)
-          self.options.delete(:compress)
+        self.compress = if self.options.key?(:always_compress)
+          self.options.delete(:always_compress)
         else
           self.environment == 'production'
         end
@@ -51,8 +51,8 @@ module Rack
         !!@always_check
       end
       
-      def compress?
-        !!@compress
+      def always_compress?
+        !!@always_compress
       end
     end
     
