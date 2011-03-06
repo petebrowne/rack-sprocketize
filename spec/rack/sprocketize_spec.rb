@@ -78,6 +78,21 @@ describe Rack::Sprocketize do
     end
   end
   
+  context 'with :always_check set to false' do
+    it 'does not concatenate' do
+      within_construct do |c|
+        c.file 'app/javascripts/main.js', '1'
+        
+        app(:always_check => false).call(request)
+        sleep 1
+        c.file 'app/javascripts/main.js', '2'
+        
+        app.call(request)
+        File.read('public/javascripts/main.js').should == '1'
+      end
+    end
+  end
+  
   context 'in a production environment' do
     before do
       Rails = double(:rails, :env => double(:env, :to_s => 'production'))
@@ -110,6 +125,21 @@ describe Rack::Sprocketize do
           c.file 'app/javascripts/main.js', '2'
           
           app.call request('/?sprocketize=1')
+          File.read('public/javascripts/main.js').should == '2'
+        end
+      end
+    end
+    
+    context 'with :always_check set to true' do
+      it 'concatenates again' do
+        within_construct do |c|
+          c.file 'app/javascripts/main.js', '1'
+          
+          app(:always_check => true).call(request)
+          sleep 1
+          c.file 'app/javascripts/main.js', '2'
+          
+          app.call(request)
           File.read('public/javascripts/main.js').should == '2'
         end
       end
