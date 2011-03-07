@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = %w(Pete Browne)
   s.email       = %w(me@petebrowne.com)
   s.homepage    = ''
-  s.summary     = %{TODO: Write a gem summary}
-  s.description = %{TODO: Write a gem description}
+  s.summary     = %(Rack::Sprocketize is a piece of Rack Middleware which uses Sprockets to concatenate javascript files and then optionally compresses them.)
+  s.description = %(Rack::Sprocketize is a piece of Rack Middleware which uses Sprockets to concatenate javascript files and then optionally compresses them. In a development environment, the files will be sprocketized on each request if there have been changes to the source files. In a production environment, the files will only be sprocketized one time, and only if there have been changes. Also, in a production environment, the files will be compressed by whichever javascript compressor is available.)
 
   s.rubyforge_project = 'rack-sprocketize'
   
