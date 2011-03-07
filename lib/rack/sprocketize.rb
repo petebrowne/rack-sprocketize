@@ -26,7 +26,7 @@ module Rack
           self.environment == 'development'
         end
       
-        self.compress = if self.options.key?(:always_compress)
+        self.always_compress = if self.options.key?(:always_compress)
           self.options.delete(:always_compress)
         else
           self.environment == 'production'

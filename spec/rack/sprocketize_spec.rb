@@ -105,7 +105,7 @@ describe Rack::Sprocketize do
     end
   end
   
-  context 'with :compress set to true' do
+  context 'with :always_compress set to true' do
     context 'with jsmin required' do
       it 'compresses the output' do
         reveal_const :JSMin do
@@ -113,7 +113,7 @@ describe Rack::Sprocketize do
             c.file 'app/javascripts/main.js', '1'
           
             JSMin.should_receive(:minify).with("1\n").and_return('compressed')
-            app(:compress => true).call(request)
+            app(:always_compress => true).call(request)
             File.read('public/javascripts/main.js').should == 'compressed'
           end
         end
@@ -127,7 +127,7 @@ describe Rack::Sprocketize do
             c.file 'app/javascripts/main.js', '1'
           
             Packr.should_receive(:pack).with("1\n", :shrink_vars => true).and_return('compressed')
-            app(:compress => true).call(request)
+            app(:always_compress => true).call(request)
             File.read('public/javascripts/main.js').should == 'compressed'
           end
         end
@@ -143,7 +143,7 @@ describe Rack::Sprocketize do
             compressor = double(:compressor)
             compressor.should_receive(:compress).with("1\n").and_return('compressed')
             YUI::JavaScriptCompressor.should_receive(:new).with(:munge => true).and_return(compressor)
-            app(:compress => true).call(request)
+            app(:always_compress => true).call(request)
             File.read('public/javascripts/main.js').should == 'compressed'
           end
         end
@@ -159,7 +159,7 @@ describe Rack::Sprocketize do
             compiler = double(:compiler)
             compiler.should_receive(:compile).with("1\n").and_return('compressed')
             Closure::Compiler.should_receive(:new).and_return(compiler)
-            app(:compress => true).call(request)
+            app(:always_compress => true).call(request)
             File.read('public/javascripts/main.js').should == 'compressed'
           end
         end
