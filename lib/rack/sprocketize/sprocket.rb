@@ -36,9 +36,13 @@ module Rack
         FileUtils.mkdir_p ::File.dirname(@output_path)
         ::File.open(@output_path, 'w') do |file|
           output = concat
-          output = compress(output) if Sprocketize.always_compress?
+          output = compress(output) if Sprocketize.always_compress? && !already_compressed?
           file.write(output.strip)
         end
+      end
+      
+      def already_compressed?
+        ::File.basename(@source_file) =~ /(-|\.)min\.js/
       end
       
       protected

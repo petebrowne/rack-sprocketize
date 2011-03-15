@@ -165,6 +165,20 @@ describe Rack::Sprocketize do
         end
       end
     end
+      
+    context 'with an already minified file' do
+      it 'does not compress the output' do
+        reveal_const :JSMin do
+          within_construct do |c|
+            c.file 'app/javascripts/main.min.js', '1'
+          
+            JSMin.should_not_receive(:minify)
+            app(:always_compress => true).call(request)
+            File.read('public/javascripts/main.min.js').should == '1'
+          end
+        end
+      end
+    end
   end
   
   context 'in a production environment' do
