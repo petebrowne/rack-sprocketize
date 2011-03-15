@@ -73,6 +73,8 @@ To pass options to the javascript compressor just use the `:compression_options`
 By default, the files are only compressed in a production environment. If for some reason you want them to always be compressed, pass the `:always_compress` option:
 
     use Rack::Sprocketize, :always_compress => true
+    
+Any files suffixed with `'.min'` or `'-min'` will not be compressed. For example, `'app/javascripts/jquery.min.js'` would not be re-compressed when it is sprocketized.
 
 ## Copyright
 
