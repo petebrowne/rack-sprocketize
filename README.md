@@ -8,16 +8,18 @@ Rack::Sprocketize is a piece of Rack Middleware which uses [Sprockets](http://ge
     
 ## Basic Usage
 
+In a Rack based app, use Rack::Sprocketize just like any other middleware, passing options if necessary.
+
     require 'rack-sprocketize'
-    use Rack::Sprocketize
+    use Rack::Sprocketize, :always_compress => true
     
-or in Rails:
+In a Rails 3 app, Rack::Sprocketize is automatically included in the middleware stack, so all you need to worry about  is configuration.
     
     # Gemfile
     gem 'rack-sprocketize'
     
     # config/application.rb
-    config.middleware.use Rack::Sprocketize
+    config.sprocketize.always_compress = true
     
 ### Sprocketizing
     
