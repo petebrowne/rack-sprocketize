@@ -89,3 +89,5 @@ module Rack
       end
   end
 end
+
+require 'rack/sprocketize/railtie' if defined?(Rails)
