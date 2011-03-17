@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = %w(Pete Browne)
   s.email       = %w(me@petebrowne.com)
-  s.homepage    = ''
+  s.homepage    = 'http://github.com/petebrowne/rack-sprocketize'
   s.summary     = %(Rack::Sprocketize is a piece of Rack Middleware which uses Sprockets to concatenate javascript files and then optionally compresses them.)
   s.description = %(Rack::Sprocketize is a piece of Rack Middleware which uses Sprockets to concatenate javascript files and then optionally compresses them. In a development environment, the files will be sprocketized on each request if there have been changes to the source files. In a production environment, the files will only be sprocketized one time, and only if there have been changes. Also, in a production environment, the files will be compressed by whichever javascript compressor is available.)
 
@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   
   s.add_dependency             'rack',             '~> 1.2.1'
   s.add_dependency             'sprockets',        '~> 1.0.2'
+  s.add_dependency             'valuable',         '~> 0.8.5'
   s.add_development_dependency 'rspec',            '~> 2.5.0'
   s.add_development_dependency 'test-construct',   '~> 1.2.0'
   s.add_development_dependency 'jsmin',            '~> 1.0.1'
