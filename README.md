@@ -37,24 +37,24 @@ Rack::Sprocketize takes each file in the given `:source_path` (`'app/javascripts
 
 So, given the following files in an app:
 
-``` ruby
-# app/javascripts/main.js
+``` javascript
+// app/javascripts/main.js
 //= require "_partial"
 
-# app/javascripts/_partial.js
+// app/javascripts/_partial.js
 var hello = 'world';
 
-# app/javascripts/plugin.js
+// app/javascripts/plugin.js
 var plugin = 'blah';
 ```
     
 Rack::Sprocketize will sprocketize them into `:output_path` like this:
 
-``` ruby
-# public/javascripts/main.js
+``` javascript
+// public/javascripts/main.js
 var hello = 'world';
 
-# public/javascripts/plugin.js
+// public/javascripts/plugin.js
 var plugin = 'blah';
 ```
     
